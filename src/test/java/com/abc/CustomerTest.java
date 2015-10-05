@@ -3,15 +3,19 @@ package com.abc;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.abc.exceptions.IncorrectAccNumException;
+
 import static org.junit.Assert.assertEquals;
+
+import java.util.List;
 
 public class CustomerTest {
 
     @Test //Test customer statement generation
     public void testApp(){
 
-        Account checkingAccount = new Account(Account.CHECKING);
-        Account savingsAccount = new Account(Account.SAVINGS);
+        Account checkingAccount = new Account(Account.CHECKING, 1);
+        Account savingsAccount = new Account(Account.SAVINGS, 2);
 
         Customer henry = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount);
 
@@ -35,23 +39,47 @@ public class CustomerTest {
 
     @Test
     public void testOneAccount(){
-        Customer oscar = new Customer("Oscar").openAccount(new Account(Account.SAVINGS));
+        Customer oscar = new Customer("Oscar").openAccount(new Account(Account.SAVINGS, 1));
         assertEquals(1, oscar.getNumberOfAccounts());
     }
 
     @Test
     public void testTwoAccount(){
         Customer oscar = new Customer("Oscar")
-                .openAccount(new Account(Account.SAVINGS));
-        oscar.openAccount(new Account(Account.CHECKING));
+                .openAccount(new Account(Account.SAVINGS, 1));
+        oscar.openAccount(new Account(Account.CHECKING, 2));
         assertEquals(2, oscar.getNumberOfAccounts());
     }
 
     @Ignore
     public void testThreeAcounts() {
         Customer oscar = new Customer("Oscar")
-                .openAccount(new Account(Account.SAVINGS));
-        oscar.openAccount(new Account(Account.CHECKING));
+                .openAccount(new Account(Account.SAVINGS, 1));
+        oscar.openAccount(new Account(Account.CHECKING, 2));
         assertEquals(3, oscar.getNumberOfAccounts());
+    }
+    
+    @Test
+    public void accountTransfer(){
+    	
+        Customer oscar = new Customer("Oscar");
+        
+        Account checkingAccount = new Account(Account.CHECKING, 1);
+        Account savingsAccount = new Account(Account.SAVINGS, 2);
+        oscar.openAccount(checkingAccount);
+        oscar.openAccount(savingsAccount);
+        oscar.getAccountById(1).deposit(100);
+        oscar.getAccountById(2).deposit(1500);
+        try {
+			oscar.accountTransfer(2, 1, 500.0);
+		} catch (IncorrectAccNumException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        assertEquals(600, oscar.getAccountById(1).getAccountBalance(), 0.0);
+        
+        
+
     }
 }
